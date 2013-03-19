@@ -22,7 +22,7 @@ function! ReTest()
     else
         let l:files = system(GetCoveredFiles('covered', l:filename) . ' | tr "\n" " " ')
     endif
-    let l:cmd = 'prove -vl --norc ' . files
+    let l:cmd = 'prove -mvl --norc ' . files
     let l:bufnr = bufwinnr("__Prove_Output__")
     if l:bufnr != -1
         echom "Found winnr " . l:bufnr
