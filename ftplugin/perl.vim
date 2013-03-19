@@ -1,5 +1,5 @@
-noremap <buffer> <leader>cv :call Coverage()<CR>
-noremap <buffer> <leader>t :call ReTest()<CR>
+noremap <silent> <buffer> <leader>cv :call Coverage()<CR>
+noremap <silent> <buffer> <leader>t :call ReTest()<CR>
 
 function! GetCoveredFiles(cmd, filename)
     let l:cmd = a:cmd . ' covering --source_file="'. a:filename .'"'
