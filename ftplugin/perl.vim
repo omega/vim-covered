@@ -35,13 +35,9 @@ function! ReTest()
     endif
     setlocal modifiable
     normal! ggdG
-    call append(0, "# Please wait for prove to run...")
-    call append(1, "# Files:")
-    let l:i = 2
-    for file in split(l:files, '\v\s')
-        call append(l:i, "# * " . file)
-        let l:i = l:i + 1
-    endfor
+    let lines = ["# Please wait for prove to run...",
+                \"# Files:"]
+    call setline(2, lines + map(split(l:files, "\v\s"), '"# * " . v:val'))
     redraw
 
     let l:proveout = system(l:cmd)
