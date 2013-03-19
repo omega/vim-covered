@@ -62,7 +62,11 @@ function! Coverage()
     let l:cmd = l:cmd . "| awk 'BEGIN { OFS=\":\" } { print $1, 1, $1; }'"
     let l:output = system(cmd)
     " Lets make a location list!
-    lgetexpr l:output
-    lopen
+    if l:output != ":1:\n"
+        lgetexpr l:output
+        lopen
+    else
+        echom "No coverage found!"
+    endif
 endfunction
 
