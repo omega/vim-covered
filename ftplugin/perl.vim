@@ -25,10 +25,8 @@ function! ReTest()
     let l:cmd = 'prove -mvl --norc ' . files
     let l:bufnr = bufwinnr("__Prove_Output__")
     if l:bufnr != -1
-        echom "Found winnr " . l:bufnr
         exec l:bufnr . "wincmd w"
     else
-        echom "No winr :("
         vsplit __Prove_Output__
         setlocal filetype=tap
         setlocal buftype=nofile
