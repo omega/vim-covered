@@ -1,13 +1,13 @@
 noremap <silent> <buffer> <leader>cv :call Coverage()<CR>
 noremap <silent> <buffer> <leader>t :call ReTest()<CR>
 
-function! GetCoveredFiles(cmd, filename)
+function! GetCoveredFiles(cmd, filename, insub)
     let l:cmd = a:cmd . ' covering --source_file="'. a:filename .'"'
     let l:subname = ''
     if !g:cfi_disable
         let l:subname = cfi#get_func_name()
     endif
-    if l:subname != ''
+    if l:subname != '' && a:insub
         let l:cmd = l:cmd . ' --sub="' . l:subname . '"'
     endif
     return l:cmd
@@ -20,7 +20,11 @@ function! ReTest()
         " If we are in a test file, just run that testfile again?
         let l:files = filename
     else
-        let l:files = system(GetCoveredFiles('covered', l:filename) . ' | tr "\n" " " ')
+        let l:files = system(GetCoveredFiles('covered', l:filename, 1) . ' | tr "\n" " " ')
+        if l:files == " "
+            " No files found, lets try nosub?
+            let l:files = system(GetCoveredFiles('covered', l:filename, 0) . ' | tr "\n" " "')
+        endif
     endif
     let l:cmd = 'prove -mvl --norc ' . files
     let l:bufnr = bufwinnr("__Prove_Output__")
@@ -38,7 +42,11 @@ function! ReTest()
     call setline(2, lines + map(split(l:files, "\v\s"), '"# * " . v:val'))
     redraw
 
-    let l:proveout = system(l:cmd)
+    if files != " "
+        let l:proveout = system(l:cmd)
+    else
+        let l:proveout = "No files selected, not running prove"
+    endif
     normal! ggdG
     call append(0, split(l:proveout, '\v\n'))
     setlocal nomodifiable
@@ -57,7 +65,7 @@ function! Coverage()
     if match(l:filename, '\.t$') > -1
         let l:cmd = l:cmd . ' by --test_file="'. l:filename .'"'
     else
-        let l:cmd = GetCoveredFiles(l:cmd, l:filename)
+        let l:cmd = GetCoveredFiles(l:cmd, l:filename, 1)
     end
     let l:cmd = l:cmd . "| awk 'BEGIN { OFS=\":\" } { print $1, 1, $1; }'"
     let l:output = system(cmd)
